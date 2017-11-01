@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
+import com.google.android.gms.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -47,29 +47,15 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+//        throw new UnsupportedOperationException("Not yet implemented");
         return null;
     }
 
     @Override
     public void onLocationChanged(Location location) {
-
+        handleNewLocation(location);
     }
 
-    @Override
-    public void onStatusChanged(String s, int i, Bundle bundle) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String s) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String s) {
-
-    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -106,11 +92,25 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        if(serviceContext != null){
+            Toast.makeText(serviceContext, "Location services suspended. Please reconnect", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.d("personal", "connection suspended, but serviceContext was null");
+        }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("personal", "connection failed");
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+        Toast.makeText(this, "Location service destroyed", Toast.LENGTH_SHORT).show();
     }
 }

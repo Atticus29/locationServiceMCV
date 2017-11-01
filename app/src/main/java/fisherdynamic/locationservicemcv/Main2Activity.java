@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-
-public class MainActivity extends AppCompatActivity {
+public class Main2Activity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 111;
     private Double currentLatitude;
     private Double currentLongitude;
@@ -23,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main2);
+
         setContentView(R.layout.activity_main);
         final TextView latLongView = findViewById(R.id.latLongView);
 
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         IntentFilter intentFilter = new IntentFilter("locationServiceUpdates");
-        LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(Main2Activity.this).registerReceiver(mMessageReceiver, intentFilter);
 
     }
 
