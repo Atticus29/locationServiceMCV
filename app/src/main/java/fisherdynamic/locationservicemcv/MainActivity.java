@@ -11,26 +11,30 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 111;
     private Double currentLatitude;
     private Double currentLongitude;
+    private Button nextActivityButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView latLongView = findViewById(R.id.latLongView);
+        nextActivityButton = findViewById(R.id.nextActivityButton);
+        nextActivityButton.setOnClickListener(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_FINE_LOCATION);
             return;
         }
-        startLocationService();
         BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -44,6 +48,21 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter("locationServiceUpdates");
         LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver, intentFilter);
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == nextActivityButton){
+            Log.d("personal", "nextActivityButton clicked");
+            Intent intent = new Intent(MainActivity.this, Main2Activity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startLocationService();
     }
 
     @Override
