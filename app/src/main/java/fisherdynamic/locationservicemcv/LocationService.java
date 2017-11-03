@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
-import com.google.android.gms.location.LocationListener;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -15,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
@@ -30,14 +30,14 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         super.onCreate();
         serviceContext = this;
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .addApi(LocationServices.API)
+            .build();
         mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)
-                .setFastestInterval(1 * 1000);
+            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+            .setInterval(10 * 1000)
+            .setFastestInterval(1 * 1000);
         mGoogleApiClient.connect();
     }
 
@@ -60,12 +60,12 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location == null) {
-            Log.d("personal", "location null");
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        } else {
-            Log.d("personal", "location not null");
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+        if (location != null) {
+            Log.d(TAG, "<<<<location not null");
             handleNewLocation(location);
+        } else {
+            Log.d(TAG, "<<<<location null");
         }
     }
 
@@ -77,31 +77,31 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
     }
 
-    public void sendToActivity(Double currentLatitude, Double currentLongitude){
+    private void sendToActivity(Double currentLatitude, Double currentLongitude) {
         Intent intent = new Intent("locationServiceUpdates");
         intent.putExtra("ServiceLatitudeUpdate", currentLatitude.toString());
         intent.putExtra("ServiceLongitudeUpdate", currentLongitude.toString());
-        if(serviceContext != null){
+        if (serviceContext != null) {
             LocalBroadcastManager.getInstance(serviceContext).sendBroadcast(intent);
-            Log.d("personal", "broadcast launched from the location service");
+            Log.d(TAG, "<<<<broadcast launched from the location service");
             Toast.makeText(this, "broadcast launched from the location service", Toast.LENGTH_SHORT).show();
-        } else{
-            Log.d("personal", "didn't broadcast the location updates because serviceContext is null");
+        } else {
+            Log.d(TAG, "<<<<didn't broadcast the location updates because serviceContext is null");
         }
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        if(serviceContext != null){
-            Toast.makeText(serviceContext, "Location services suspended. Please reconnect", Toast.LENGTH_SHORT).show();
+        if (serviceContext != null) {
+            Toast.makeText(serviceContext, "<<<<Location services suspended. Please reconnect", Toast.LENGTH_SHORT).show();
         } else {
-            Log.d("personal", "connection suspended, but serviceContext was null");
+            Log.d(TAG, "<<<<connection suspended, but serviceContext was null");
         }
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d("personal", "connection failed");
+        Log.d(TAG, "<<<<connection failed");
     }
 
     @Override
@@ -113,4 +113,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         }
         Toast.makeText(this, "Location service destroyed", Toast.LENGTH_SHORT).show();
     }
+
+    private static final String TAG = "LocationService";
 }
