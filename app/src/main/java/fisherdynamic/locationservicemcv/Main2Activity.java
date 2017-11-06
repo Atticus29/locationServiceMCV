@@ -32,8 +32,14 @@ public class Main2Activity extends AppCompatActivity {
                 latLongView.setText(Double.toString(currentLatitude) + ", " + Double.toString(currentLongitude));
             }
         };
-        IntentFilter intentFilter = new IntentFilter("locationServiceUpdates");
-        LocalBroadcastManager.getInstance(Main2Activity.this).registerReceiver(mMessageReceiver, intentFilter);
+
+//        IntentFilter intentFilter = new IntentFilter("locationServiceUpdates");
+        registerLocalReceiver(mMessageReceiver,"locationServiceUpdates");
+    }
+
+    private void registerLocalReceiver(BroadcastReceiver receiver, String action) {
+        IntentFilter intentFilter = new IntentFilter(action);
+        LocalBroadcastManager.getInstance(Main2Activity.this).registerReceiver(receiver, intentFilter);
     }
 
     @Override

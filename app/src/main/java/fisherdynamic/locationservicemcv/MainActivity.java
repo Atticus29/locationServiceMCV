@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Double currentLatitude;
     private Double currentLongitude;
     private Button nextActivityButton;
+    private  BroadcastReceiver mMessageReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nextActivityButton = findViewById(R.id.nextActivityButton);
         nextActivityButton.setOnClickListener(this);
 
-        BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "<<<<on receive reached");
@@ -83,7 +84,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopLocationService();
+        unregisterLocalReceiver(mMessageReceiver);
+    }
+
+    private void unregisterLocalReceiver(BroadcastReceiver receiver) {
+        LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(receiver);
     }
 
     private void requestLocationPermission() {
