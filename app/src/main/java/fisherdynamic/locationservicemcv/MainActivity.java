@@ -18,12 +18,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/*
+***** App started
+10531-10531/? D/MainActivity: <<<<location service started
+10531-10531/? D/LocationService: <<<<location not null
+10531-10531/? D/LocationService: <<<<broadcast launched from the location service
+
+***** Initial location received
+10531-10531/? D/MainActivity: <<<<on receive reached
+10531-10531/fisherdynamic.locationservicemcv D/LocationService: <<<<broadcast launched from the location service
+10531-10531/fisherdynamic.locationservicemcv D/MainActivity: <<<<on receive reached
+
+10531-10531/fisherdynamic.locationservicemcv D/MainActivity: <<<<nextActivityButton clicked
+
+***** Location change sent to both activities
+10531-10531/fisherdynamic.locationservicemcv D/LocationService: <<<<broadcast launched from the location service
+10531-10531/fisherdynamic.locationservicemcv D/MainActivity: <<<<on receive reached
+10531-10531/fisherdynamic.locationservicemcv D/Main2Activity: <<<<on receive reached
+
+***** App stopped
+10531-10531/fisherdynamic.locationservicemcv D/MainActivity: <<<<location service stopped
+ */
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 111;
     private Double currentLatitude;
     private Double currentLongitude;
     private Button nextActivityButton;
-    private  BroadcastReceiver mMessageReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nextActivityButton = findViewById(R.id.nextActivityButton);
         nextActivityButton.setOnClickListener(this);
 
-        mMessageReceiver = new BroadcastReceiver() {
+        BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Log.d(TAG, "<<<<on receive reached");
@@ -84,11 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterLocalReceiver(mMessageReceiver);
-    }
-
-    private void unregisterLocalReceiver(BroadcastReceiver receiver) {
-        LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(receiver);
+        stopLocationService();
     }
 
     private void requestLocationPermission() {
