@@ -15,6 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -27,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final TextView latLongView = findViewById(R.id.latLongView);
         nextActivityButton = findViewById(R.id.nextActivityButton);
         nextActivityButton.setOnClickListener(this);
 
@@ -42,13 +45,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Get extra data included in the Intent
                 currentLatitude = Double.parseDouble(intent.getStringExtra("ServiceLatitudeUpdate"));
                 currentLongitude = Double.parseDouble(intent.getStringExtra("ServiceLongitudeUpdate"));
-                latLongView.setText(Double.toString(currentLatitude) + ", " + Double.toString(currentLongitude));
+//                latLongView.setText(Double.toString(currentLatitude) + ", " + Double.toString(currentLongitude));
             }
         };
         IntentFilter intentFilter = new IntentFilter("locationServiceUpdates");
-        LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver, intentFilter);
+//        LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(mMessageReceiver, intentFilter);
 
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // This line will unregister your Activity.
+        // It's a good practice to put this on the onPause() method
+        // to make your event handling system tied to the Activity lifecycle.
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // This line will register your Activity to the EventBus
+        // making sure that all the methods annotated with @Subscribe
+        // will be called if their specific Events are posted.
+        EventBus.getDefault().register(this);
+    }
+
+    // The threadMode MAIN makes sure this method is called on the main Thread.
+    // But you could also set it up to be called on other threads if needed. Check the docs for more info.
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
+        double lat = event.lat;
+        double lng = event.lng;
+
+        TextView latLongView = findViewById(R.id.latLongView);
+        latLongView.setText(Double.toString(lat) + ", " + Double.toString(lng));
+        // Do whatever you want with the data.
+    };
 
     @Override
     public void onClick(View view) {

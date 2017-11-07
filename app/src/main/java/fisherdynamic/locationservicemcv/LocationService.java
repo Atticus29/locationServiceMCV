@@ -18,6 +18,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.greenrobot.eventbus.EventBus;
+
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -73,6 +75,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         if (currentLatitude != null && currentLongitude != null) {
+            EventBus.getDefault().postSticky(new MessageEvent(currentLatitude,currentLongitude));
             sendToActivity(currentLatitude, currentLongitude);
         }
     }
