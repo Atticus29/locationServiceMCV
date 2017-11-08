@@ -115,5 +115,6 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             mGoogleApiClient.disconnect();
         }
         Toast.makeText(this, "Location service destroyed", Toast.LENGTH_SHORT).show();
+        EventBus.getDefault().removeAllStickyEvents();
     }
 }

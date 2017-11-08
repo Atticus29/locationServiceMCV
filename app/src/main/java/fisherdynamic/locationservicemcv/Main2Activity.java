@@ -77,7 +77,7 @@ public class Main2Activity extends AppCompatActivity {
     // But you could also set it up to be called on other threads if needed. Check the docs for more info.
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MessageEvent event) {
-        EventBus.getDefault().removeStickyEvent(event);
+//        EventBus.getDefault().removeStickyEvent(event);
         double lat = event.lat;
         double lng = event.lng;
 
